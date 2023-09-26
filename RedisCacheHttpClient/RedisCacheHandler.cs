@@ -23,6 +23,7 @@ internal class RedisCacheHandler : DelegatingHandler
             var httpResponseMessage = await base.SendAsync(request, cancellationToken);
             _ = Task.Run(async () =>
             {
+                await httpResponseMessage.Content.LoadIntoBufferAsync();
                 var bytes1 = await httpResponseMessage.Content.ReadAsByteArrayAsync(cancellationToken);
                 await distributedCache.SetAsync(key, bytes1, new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2) }, cancellationToken);
             }, cancellationToken);
