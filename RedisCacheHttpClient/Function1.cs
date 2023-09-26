@@ -1,7 +1,11 @@
+using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -10,16 +14,19 @@ using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace RedisCacheHttpClient
 {
     public class Function1
     {
         private readonly ILogger<Function1> _logger;
+        private readonly IClientService clientService;
 
-        public Function1(ILogger<Function1> log)
+        public Function1(ILogger<Function1> log, IClientService clientService)
         {
             _logger = log;
+            this.clientService = clientService;
         }
 
         [FunctionName("Function1")]
@@ -43,6 +50,23 @@ namespace RedisCacheHttpClient
                 : $"Hello, {name}. This HTTP triggered function executed successfully.";
 
             return new OkObjectResult(responseMessage);
+        }
+
+        [FunctionName(nameof(Boredapi))]
+        public async Task<IActionResult> Boredapi([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "bored")] HttpRequest httpRequest, CancellationToken cancellationToken)
+        {
+            if (httpRequest is null)
+            {
+                throw new ArgumentNullException(nameof(httpRequest));
+            }
+            var key = httpRequest.Query["key"];
+            if (key.Count == 0)
+            {
+                return new BadRequestErrorMessageResult($"Missing query paramenter: {nameof(key)}");
+            }
+            var httpResponseMessage = await clientService.GetTaskAsync(key);
+            var stream = await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken);
+            return new FileStreamResult(stream, Application.Json);
         }
     }
 }
