@@ -12,6 +12,9 @@ public class ClientService(IHttpClientFactory httpClientFactory) : IClientServic
             { "key", query }
         };
         var httpResponseMessage = await httpClient.GetAsync(query2.ToString());
+
+        // TODO: here you can do other processing with the response
+
         return httpResponseMessage;
     }
 }
