@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="EnvironmentTests/EnvironmentTests.csproj" Id="85c55be8-e920-4554-946e-141f00964e66" />
+  <Project Path="RedisCacheHttpClient/RedisCacheHttpClient.csproj" />
+</Solution>

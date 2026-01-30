@@ -1,7 +1,4 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
-
-namespace RedisCacheHttpClient;
+﻿namespace RedisCacheHttpClient;
 
 public interface IClientService
 {
